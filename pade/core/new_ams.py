@@ -32,6 +32,7 @@ from pade.web import flask_server
 from pade.web.flask_server import db, Session, User, basedir
 
 from pickle import dumps, loads
+from base64 import b64encode, b64decode
 from datetime import datetime
 import uuid
 from terminaltables import AsciiTable
@@ -201,7 +202,7 @@ class CompVerifyRegister(FipaRequestProtocol):
 
     def handle_request(self, message):
         super(CompVerifyRegister, self).handle_request(message)
-        content = loads(message.content)
+        content = loads(b64decode(message.content))
         display_message(self.agent.aid.name,
                         'Validating agent ' + message.sender.name + ' session.')
         if type(content) == dict:

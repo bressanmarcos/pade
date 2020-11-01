@@ -37,6 +37,7 @@ from twisted.internet import reactor
 from sqlalchemy import create_engine, MetaData, Table
 
 from pickle import loads, dumps
+from base64 import b64encode, b64decode
 import xml.etree.ElementTree as ET
 import random
 import os
@@ -113,7 +114,7 @@ class Sniffer(Agent):
     def react(self, message):
         super(Sniffer, self).react(message)
         if 'ams' not in message.sender.name:
-            content = loads(message.content)
+            content = loads(b64decode(message.content))
             if content['ref'] == 'MESSAGE':
                 _message = content['message']
                 if self.messages_buffer.get(message.sender.name) == None:

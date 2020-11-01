@@ -36,6 +36,7 @@ import xml.etree.ElementTree as ET
 from xml.dom import minidom
 from datetime import datetime
 from uuid import uuid1
+from base64 import b64encode, b64decode
 from pade.acl.aid import AID
 
 
@@ -230,6 +231,9 @@ class ACLMessage(ET.Element):
         if isinstance(data, ET.Element):
             self.content = data
             self.find('content').append(data)
+        elif isinstance(data, bytes):
+            self.content = b64encode(data).decode('utf-8')
+            self.find('content').text = self.content
         else:
             self.content = data
             self.find('content').text = self.content

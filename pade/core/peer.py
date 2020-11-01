@@ -46,7 +46,7 @@ class PeerProtocol(Protocol):
             if int(message[0].port) == int(peer.port):
                 if str(message[0].host) == 'localhost' and str(peer.host) == '127.0.0.1' or \
                    str(message[0].host) == str(peer.host):
-                    self.send_message(pickle.dumps(message[1]))
+                    self.send_message(message[1].get_message())
                     sended_message = message
                     break
         if sended_message is not None:
@@ -55,7 +55,8 @@ class PeerProtocol(Protocol):
     def connectionLost(self, reason):
         if self.message is not None:
             try:
-                message = pickle.loads(self.message)
+                message = ACLMessage()
+                message.set_message(self.message)
             except:
                 print('Message not understood')
                 print(self.message)

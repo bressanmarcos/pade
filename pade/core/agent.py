@@ -43,6 +43,7 @@ from pade.acl.aid import AID
 from pade.misc.utility import display_message
 
 from pickle import dumps, loads
+from base64 import b64encode, b64decode
 import random
 
 
@@ -650,7 +651,7 @@ class SubscribeBehaviour(FipaSubscribeProtocol):
         """
         if self.agent.debug:
             display_message(self.agent.aid.name, 'Table update')
-        self.agent.agentInstance.table = loads(message.content)
+        self.agent.agentInstance.table = loads(b64decode(message.content))
 
 
 class CompConnection(FipaRequestProtocol):
