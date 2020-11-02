@@ -79,7 +79,7 @@ class FipaRequestProtocolInitiator(_FipaRequestProtocol):
 
     def delete_session(self, session_id):
         """Delete an open session and terminate protocol session"""
-        
+
         try:
             generator = self.open_sessions.pop(session_id)
         except KeyError:
@@ -142,6 +142,46 @@ class FipaRequestProtocolParticipant(_FipaRequestProtocol):
         """Add function to be called for request"""
         self.callbacks.append(callback)
 
+    def send_inform(self, message: ACLMessage):
+
+        message.set_protocol(ACLMessage.FIPA_REQUEST_PROTOCOL)
+        message.set_performative(ACLMessage.REQUEST)
+
+        # Send message to all receivers
+        self.agent.send(message)
+
+        return message
+
+    def send_failure(self, message: ACLMessage):
+
+        message.set_protocol(ACLMessage.FIPA_REQUEST_PROTOCOL)
+        message.set_performative(ACLMessage.FAILURE)
+
+        # Send message to all receivers
+        self.agent.send(message)
+
+        return message
+
+    def send_agree(self, message: ACLMessage):
+
+        message.set_protocol(ACLMessage.FIPA_REQUEST_PROTOCOL)
+        message.set_performative(ACLMessage.AGREE)
+
+        # Send message to all receivers
+        self.agent.send(message)
+
+        return message
+
+    def send_refuse(self, message: ACLMessage):
+
+        message.set_protocol(ACLMessage.FIPA_REQUEST_PROTOCOL)
+        message.set_performative(ACLMessage.REFUSE)
+
+        # Send message to all receivers
+        self.agent.send(message)
+
+        return message
+
 
 def FipaRequestProtocol(agent, is_initiator=True):
 
@@ -149,6 +189,6 @@ def FipaRequestProtocol(agent, is_initiator=True):
         instance = FipaRequestProtocolInitiator(agent)
     else:
         instance = FipaRequestProtocolParticipant(agent)
-    
+
     agent.behaviours.append(instance)
     return instance
