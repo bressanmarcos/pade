@@ -326,7 +326,7 @@ class Agent_(object):
             try:
                 self.__ams['name'] = value['name']
                 self.__ams['port'] = value['port']
-            except (Exception, e):
+            except Exception as e:
                 raise e
 
     @property
@@ -347,7 +347,7 @@ class Agent_(object):
             try:
                 self.__sniffer['name'] = value['name']
                 self.__sniffer['port'] = value['port']
-            except (Exception, e):
+            except Exception as e:
                 raise e
     """
     #agentInstance will only be created after the session is created, not in the agent instantiation

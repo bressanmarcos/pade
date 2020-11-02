@@ -219,7 +219,7 @@ class ACLMessage(ET.Element):
 
         """
         if isinstance(aid, AID):
-            self.reply_to.append[aid]
+            self.reply_to.append(aid)
             reply_to = self.find('reply_to')
             receiver = ET.Element('receiver')
             receiver.text = str(aid.name)
