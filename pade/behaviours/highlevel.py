@@ -3,6 +3,7 @@ from typing import Any, Callable
 from pade.acl.messages import ACLMessage
 from pade.behaviours.protocols import \
     FipaRequestProtocol as _FipaRequestProtocol
+from pade.core.agent import ImprovedAgent
 
 
 class FipaProtocolComplete(Exception):
@@ -98,7 +99,7 @@ class FipaRequestProtocolInitiator(_FipaRequestProtocol):
         message.set_performative(ACLMessage.REQUEST)
 
         # Send message to all receivers
-        self.agent.send(message)
+        self.agent.send_until(message)
 
         return message
 
@@ -148,7 +149,7 @@ class FipaRequestProtocolParticipant(_FipaRequestProtocol):
         message.set_performative(ACLMessage.INFORM)
 
         # Send message to all receivers
-        self.agent.send(message)
+        self.agent.send_until(message)
 
         return message
 
@@ -158,7 +159,7 @@ class FipaRequestProtocolParticipant(_FipaRequestProtocol):
         message.set_performative(ACLMessage.FAILURE)
 
         # Send message to all receivers
-        self.agent.send(message)
+        self.agent.send_until(message)
 
         return message
 
@@ -168,7 +169,7 @@ class FipaRequestProtocolParticipant(_FipaRequestProtocol):
         message.set_performative(ACLMessage.AGREE)
 
         # Send message to all receivers
-        self.agent.send(message)
+        self.agent.send_until(message)
 
         return message
 
@@ -178,12 +179,12 @@ class FipaRequestProtocolParticipant(_FipaRequestProtocol):
         message.set_performative(ACLMessage.REFUSE)
 
         # Send message to all receivers
-        self.agent.send(message)
+        self.agent.send_until(message)
 
         return message
 
 
-def FipaRequestProtocol(agent, is_initiator=True):
+def FipaRequestProtocol(agent: ImprovedAgent, is_initiator=True):
 
     if is_initiator:
         instance = FipaRequestProtocolInitiator(agent)
