@@ -1,24 +1,15 @@
-import pickle
-import subprocess
 import time
 from random import randint
-from base64 import b64decode, b64encode
-from sys import argv
-
-from twisted.internet import defer
 
 from pade.acl.aid import AID
 from pade.acl.messages import ACLMessage
 from pade.behaviours.highlevel import *
 from pade.behaviours.highlevel import FipaRequestProtocol
-from pade.behaviours.protocols import TimedBehaviour
-from pade.core import new_ams
-from pade.core.agent import Agent
-from pade.core.sniffer import Sniffer
+from pade.core.agent import ImprovedAgent
 from pade.misc.utility import display_message, start_loop
 from pade.misc.utility import defer_to_thread, call_in_thread, call_from_thread
 
-class Sender(Agent):
+class Sender(ImprovedAgent):
 
     def __init__(self, aid, recipients_aid):
         super(Sender, self).__init__(aid=aid)
@@ -57,7 +48,7 @@ class Sender(Agent):
             self.request_behavior.run(async_request(receiver))
 
 
-class Recipient(Agent):
+class Recipient(ImprovedAgent):
     def __init__(self, aid, calculator_aid):
         super(Recipient, self).__init__(aid=aid)
         self.calculator_aid = calculator_aid
@@ -125,7 +116,7 @@ class Recipient(Agent):
         self.send(reply_agree)
 
 
-class Calculator(Agent):
+class Calculator(ImprovedAgent):
     def __init__(self, aid):
         super(Calculator, self).__init__(aid)
         self.calculator_behaviour = FipaRequestProtocol(self, is_initiator=False)
@@ -142,36 +133,17 @@ class Calculator(Agent):
         self.send(reply)
 
 if __name__ == "__main__":
-
-    # Define IP e porta do AMS
-    ams_dict = {'name': 'localhost', 'port': 32000}
-
-    # Executa AMS num subprocesso com ``python new_ams.py user email pass {porta}``
-    commands = ['python', new_ams.__file__, 'pade_user',
-                'email@', '12345', str(ams_dict['port'])]
-    p = subprocess.Popen(commands, stdin=subprocess.PIPE)
-
-    # Instancia Sniffer para ser executado na {porta+1}
-    sniffer = Sniffer(host=ams_dict['name'], port=ams_dict['port']+1)
-    sniffer.ams = ams_dict
-
-    # Pausa para iniciar AMS
-    time.sleep(4)
-
     agents = list()
 
     # Calculator agent
     calculator_agent = Calculator(AID('calculator@localhost:55000'))
-    calculator_agent.ams = ams_dict
     agents.append(calculator_agent)
 
     # Recipients
     recipient_agent_1 = Recipient(AID("bravo@localhost:52000"), calculator_agent.aid)
-    recipient_agent_1.ams = ams_dict
     agents.append(recipient_agent_1)
 
     recipient_agent_2 = Recipient(AID("charlie@localhost:50001"), calculator_agent.aid)
-    recipient_agent_2.ams = ams_dict
     agents.append(recipient_agent_2)
 
     # Sender
@@ -179,7 +151,6 @@ if __name__ == "__main__":
         AID("alfa@localhost:61000"), 
         [recipient_agent_1.aid, recipient_agent_2.aid]
     )
-    sender_agent.ams = ams_dict
     agents.append(sender_agent)
 
     start_loop(agents)

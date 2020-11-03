@@ -757,3 +757,19 @@ class Agent(Agent_):
             'message' : message}))
             _message.set_system_message(is_system_message=True)
             self.send(_message)
+
+
+class ImprovedAgent(Agent):
+    def send_until(self, message, tries=10, interval=2.0):
+        """
+            Send message once all receivers addresses are
+            available in agents table.
+        """
+        if tries == 0:
+            return
+
+        if hasattr(self, 'agentInstance') and all(receiver.name in self.agentInstance.table for receiver in message.receivers):
+            self.send(message)
+        else:
+            self.call_later(interval, self.send_until,
+                            message, tries-1, interval)

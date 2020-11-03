@@ -3,6 +3,7 @@ from typing import Any, Callable
 from pade.acl.messages import ACLMessage
 from pade.behaviours.protocols import \
     FipaRequestProtocol as _FipaRequestProtocol
+from pade.core.agent import ImprovedAgent
 
 
 class FipaProtocolComplete(Exception):
@@ -70,8 +71,10 @@ class FipaRequestProtocolInitiator(_FipaRequestProtocol):
         }
         try:
             handlers[message.performative]()
-        except StopIteration:
+        except (StopIteration, FipaMessageHandler):
             pass
+        except KeyError:
+            return
 
         # Clear session if final message was received
         if message.performative in (ACLMessage.REFUSE, ACLMessage.INFORM, ACLMessage.FAILURE):
@@ -79,7 +82,6 @@ class FipaRequestProtocolInitiator(_FipaRequestProtocol):
 
     def delete_session(self, session_id):
         """Delete an open session and terminate protocol session"""
-        
         try:
             generator = self.open_sessions.pop(session_id)
         except KeyError:
@@ -89,7 +91,7 @@ class FipaRequestProtocolInitiator(_FipaRequestProtocol):
                 # Signal protocol completion if it's the last message
                 try:
                     generator.throw(FipaProtocolComplete)
-                except StopIteration:
+                except (StopIteration, FipaProtocolComplete):
                     pass
 
     def send_request(self, message: ACLMessage):
@@ -98,7 +100,7 @@ class FipaRequestProtocolInitiator(_FipaRequestProtocol):
         message.set_performative(ACLMessage.REQUEST)
 
         # Send message to all receivers
-        self.agent.send(message)
+        self.agent.send_until(message)
 
         return message
 
@@ -139,15 +141,55 @@ class FipaRequestProtocolParticipant(_FipaRequestProtocol):
             callback(message)
 
     def add_callback(self, callback: Callable[[ACLMessage], Any]):
+        """Add function to be called for request"""
         self.callbacks.append(callback)
 
+    def send_inform(self, message: ACLMessage):
 
-def FipaRequestProtocol(agent, is_initiator=True):
+        message.set_protocol(ACLMessage.FIPA_REQUEST_PROTOCOL)
+        message.set_performative(ACLMessage.INFORM)
+
+        # Send message to all receivers
+        self.agent.send_until(message)
+
+        return message
+
+    def send_failure(self, message: ACLMessage):
+
+        message.set_protocol(ACLMessage.FIPA_REQUEST_PROTOCOL)
+        message.set_performative(ACLMessage.FAILURE)
+
+        # Send message to all receivers
+        self.agent.send_until(message)
+
+        return message
+
+    def send_agree(self, message: ACLMessage):
+
+        message.set_protocol(ACLMessage.FIPA_REQUEST_PROTOCOL)
+        message.set_performative(ACLMessage.AGREE)
+
+        # Send message to all receivers
+        self.agent.send_until(message)
+
+        return message
+
+    def send_refuse(self, message: ACLMessage):
+
+        message.set_protocol(ACLMessage.FIPA_REQUEST_PROTOCOL)
+        message.set_performative(ACLMessage.REFUSE)
+
+        # Send message to all receivers
+        self.agent.send_until(message)
+
+        return message
+
+
+def FipaRequestProtocol(agent: ImprovedAgent, is_initiator=True):
 
     if is_initiator:
         instance = FipaRequestProtocolInitiator(agent)
     else:
         instance = FipaRequestProtocolParticipant(agent)
-    
     agent.behaviours.append(instance)
     return instance
