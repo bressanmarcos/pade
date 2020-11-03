@@ -5,11 +5,11 @@ from pade.acl.aid import AID
 from pade.acl.messages import ACLMessage
 from pade.behaviours.highlevel import *
 from pade.behaviours.highlevel import FipaRequestProtocol
-from pade.core.agent import Agent
+from pade.core.agent import ImprovedAgent
 from pade.misc.utility import display_message, start_loop
 from pade.misc.utility import defer_to_thread, call_in_thread, call_from_thread
 
-class Sender(Agent):
+class Sender(ImprovedAgent):
 
     def __init__(self, aid, recipients_aid):
         super(Sender, self).__init__(aid=aid)
@@ -48,7 +48,7 @@ class Sender(Agent):
             self.request_behavior.run(async_request(receiver))
 
 
-class Recipient(Agent):
+class Recipient(ImprovedAgent):
     def __init__(self, aid, calculator_aid):
         super(Recipient, self).__init__(aid=aid)
         self.calculator_aid = calculator_aid
@@ -116,7 +116,7 @@ class Recipient(Agent):
         self.send(reply_agree)
 
 
-class Calculator(Agent):
+class Calculator(ImprovedAgent):
     def __init__(self, aid):
         super(Calculator, self).__init__(aid)
         self.calculator_behaviour = FipaRequestProtocol(self, is_initiator=False)
