@@ -145,7 +145,7 @@ class FipaRequestProtocolParticipant(_FipaRequestProtocol):
     def send_inform(self, message: ACLMessage):
 
         message.set_protocol(ACLMessage.FIPA_REQUEST_PROTOCOL)
-        message.set_performative(ACLMessage.REQUEST)
+        message.set_performative(ACLMessage.INFORM)
 
         # Send message to all receivers
         self.agent.send(message)
