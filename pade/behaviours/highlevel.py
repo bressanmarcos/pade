@@ -71,8 +71,10 @@ class FipaRequestProtocolInitiator(_FipaRequestProtocol):
         }
         try:
             handlers[message.performative]()
-        except StopIteration:
+        except (StopIteration, FipaMessageHandler):
             pass
+        except KeyError:
+            return
 
         # Clear session if final message was received
         if message.performative in (ACLMessage.REFUSE, ACLMessage.INFORM, ACLMessage.FAILURE):
@@ -90,7 +92,7 @@ class FipaRequestProtocolInitiator(_FipaRequestProtocol):
                 # Signal protocol completion if it's the last message
                 try:
                     generator.throw(FipaProtocolComplete)
-                except StopIteration:
+                except (StopIteration, FipaProtocolComplete):
                     pass
 
     def send_request(self, message: ACLMessage):
