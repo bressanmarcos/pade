@@ -13,12 +13,10 @@ class Sender(ImprovedAgent):
 
     def __init__(self, aid, recipients_aid):
         super(Sender, self).__init__(aid=aid)
-        self.recipients_aid = recipients_aid
-
         self.request_behavior = FipaRequestProtocol(self, is_initiator=True)
-        self.call_later(15.0, self.on_time)
+        self.call_later(15.0, lambda: self.on_time(recipients_aid))
 
-    def on_time(self):
+    def on_time(self, recipients_aid):
 
         def async_request(receiver):
             # Message to send
@@ -44,7 +42,7 @@ class Sender(ImprovedAgent):
                     display_message(self.aid.name, f'I received all messages from {receiver.name}!')
                     break
 
-        for receiver in self.recipients_aid:
+        for receiver in recipients_aid:
             self.request_behavior.run(async_request(receiver))
 
 
