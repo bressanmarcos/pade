@@ -92,7 +92,7 @@ class FipaRequestProtocolInitiator(GenericFipaProtocol):
         }
         try:
             handlers[message.performative]()
-        except (StopIteration, FipaMessageHandler):
+        except StopIteration:
             pass
         except KeyError:
             return
@@ -263,7 +263,7 @@ class FipaContractNetProtocolInitiator(GenericFipaProtocol):
         # Resume generator
         try:
             handlers[message.performative]()
-        except (StopIteration, FipaMessageHandler):
+        except StopIteration:
             pass
         except KeyError:
             return
@@ -391,7 +391,7 @@ class FipaContractNetProtocolParticipant(GenericFipaProtocol):
         }
         try:
             handlers[message.performative]()
-        except (StopIteration, FipaMessageHandler):
+        except StopIteration:
             pass
         except KeyError:
             return
