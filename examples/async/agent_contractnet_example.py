@@ -21,6 +21,7 @@ class Manager(ImprovedAgent):
 
     def call_proposals(self, recipients_aid):
 
+        @self.contract_net.synchronize
         def async_cfp():
             # Message to send
             message = ACLMessage()
@@ -85,7 +86,7 @@ class Manager(ImprovedAgent):
                 failure = h.message
 
 
-        self.contract_net.run(async_cfp())
+        async_cfp()
 
 class Contractor(ImprovedAgent):
     def __init__(self, aid):
@@ -111,6 +112,7 @@ class Contractor(ImprovedAgent):
         reply.set_performative(ACLMessage.PROPOSE)
         reply.set_content(str(randint(0, 1000)))
 
+        @self.contract_net.synchronize
         def async_propose():
             self.contract_net.send_propose(reply)
             # Wait for response
@@ -140,8 +142,8 @@ class Contractor(ImprovedAgent):
                     self.aid.name,
                     f'I received REJECT-PROPOSAL: {reject_proposal.content} from {reject_proposal.sender.name}'
                 )
-        self.contract_net.run(async_propose())
-
+        
+        async_propose()
 
 if __name__ == "__main__":
     agents = list()

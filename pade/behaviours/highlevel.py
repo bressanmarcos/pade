@@ -48,6 +48,10 @@ class GenericFipaProtocol(Behaviour):
     def __init__(self, agent):
         super().__init__(agent)
 
+    def synchronize(self, async_f):
+        def synchronized(*args, **kwargs):
+            return self.run(async_f(*args, **kwargs))
+        return synchronized
     
     def run(self, generator):
         pass
