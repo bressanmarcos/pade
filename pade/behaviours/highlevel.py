@@ -1,7 +1,7 @@
 from typing import Any, Callable
 
 from pade.acl.messages import ACLMessage
-from pade.behaviours.protocols import FipaProtocol
+from pade.behaviours.protocols import Behaviour
 from pade.core.agent import ImprovedAgent
 
 
@@ -44,11 +44,18 @@ class FipaFailureHandler(FipaMessageHandler):
 class FipaRejectProposalHandler(FipaMessageHandler):
     """Exception handler for FIPA-REJECT-PROPOSAL messages"""
 
+class GenericFipaProtocol(Behaviour):
+    def __init__(self, agent):
+        super().__init__(agent)
 
-class FipaRequestProtocolInitiator(FipaProtocol):
+    
+    def run(self, generator):
+        pass
+
+class FipaRequestProtocolInitiator(GenericFipaProtocol):
 
     def __init__(self, agent):
-        super().__init__(agent, message=None, is_initiator=True)
+        super().__init__(agent)
 
         # Denote each open request. It is possible to have multiple
         # sessions with a same party.
@@ -127,10 +134,10 @@ class FipaRequestProtocolInitiator(FipaProtocol):
         self.agent.call_later(60, lambda: self.delete_session(session_id))
 
 
-class FipaRequestProtocolParticipant(FipaProtocol):
+class FipaRequestProtocolParticipant(GenericFipaProtocol):
 
     def __init__(self, agent):
-        super().__init__(agent, message=None, is_initiator=False)
+        super().__init__(agent)
         self.callbacks = []
 
     def execute(self, message: ACLMessage):
@@ -205,11 +212,10 @@ def FipaRequestProtocol(agent: ImprovedAgent, is_initiator=True):
     agent.behaviours.append(instance)
     return instance
 
-class FipaContractNetProtocolInitiator(FipaProtocol):
+class FipaContractNetProtocolInitiator(GenericFipaProtocol):
 
     def __init__(self, agent):
-        super().__init__(
-            agent, message=None, is_initiator=True)
+        super().__init__(agent)
 
         # Denote each open request. It is possible to have multiple
         # sessions with a same party.
@@ -345,11 +351,10 @@ class FipaContractNetProtocolInitiator(FipaProtocol):
         self.agent.call_later(60, lambda: self.delete_session(session_id))
 
 
-class FipaContractNetProtocolParticipant(FipaProtocol):
+class FipaContractNetProtocolParticipant(GenericFipaProtocol):
 
     def __init__(self, agent):
-        super().__init__(
-            agent, message=None, is_initiator=False)
+        super().__init__(agent)
         self.cfp_handlers = []
         self.open_sessions = {}
 
