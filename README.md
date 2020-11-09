@@ -27,7 +27,7 @@ The instructions below are complementary to the official project, and detail spe
 
 - Interaction protocols provide a `run` method, intended to span and manage multiple sessions at the side of the initiator agent for each executed request. The `run` method receives a generator that yields right after sending an initiating message and creating a session;
 
-- A session is identified by a pair (`participant aid`, `message correlation id`). It is created when an initiating send message is sent (`request`, `subscribe`, `cfp`) and deleted when the protocol is terminated (last message received, subscription cancelled, and so on). A session redirects received messages to its respective generator, resuming the calling process where it was paused / "yielded". The following code depicts the process to send a request:
+- A session is identified by the message `correlation id`. It is created when an initiating send message is sent (`request`, `subscribe`, `cfp`) and deleted when the protocol is terminated (last message received, subscription cancelled, and so on). A session redirects received messages to its respective generator, resuming the calling process where it was paused / "yielded". The following code depicts the process to send a request:
 
 ```python
 class AnAgent(ImprovedAgent):
@@ -36,6 +36,8 @@ class AnAgent(ImprovedAgent):
         # `self.request` is also automatically added to `self.behaviours` to
         # avoid verbosity
     def make_request(receiver_aid):
+
+        @self.request.synchronize
         def async_request():
             message = ACLMessage()
             message.add_receiver(receiver_aid)
@@ -56,5 +58,5 @@ class AnAgent(ImprovedAgent):
                     break
             # Code after protocol end
         # Launch async request
-        self.request.run(async_request())
+        async_request()
 ```
