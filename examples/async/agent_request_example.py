@@ -18,6 +18,7 @@ class Sender(ImprovedAgent):
 
     def on_time(self, recipients_aid):
 
+        @self.request_behavior.synchronize
         def async_request(receiver):
             # Message to send
             message = ACLMessage()
@@ -43,7 +44,7 @@ class Sender(ImprovedAgent):
                     break
 
         for receiver in recipients_aid:
-            self.request_behavior.run(async_request(receiver))
+            async_request(receiver)
 
 
 class Recipient(ImprovedAgent):
