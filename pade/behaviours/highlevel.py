@@ -161,7 +161,7 @@ class FipaRequestProtocolParticipant(GenericFipaProtocol):
         for callback in self.callbacks:
             callback(message)
 
-    def add_callback(self, callback: Callable[[ACLMessage], Any]):
+    def add_request_handler(self, callback: Callable[[ACLMessage], Any]):
         """Add function to be called for request"""
         self.callbacks.append(callback)
 
@@ -407,7 +407,7 @@ class FipaContractNetProtocolParticipant(GenericFipaProtocol):
             pass
 
     def add_cfp_handler(self, callback: Callable[[ACLMessage], Any]):
-        """Add function to be called for request"""
+        """Add function to be called on cfp"""
 
         self.cfp_handlers.append(callback)
 

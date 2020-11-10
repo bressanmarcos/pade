@@ -52,10 +52,10 @@ class Recipient(ImprovedAgent):
         super(Recipient, self).__init__(aid=aid)
         self.calculator_aid = calculator_aid
         self.inform_behavior = FipaRequestProtocol(self, is_initiator=False)
-        self.inform_behavior.add_callback(self.handle_request)
+        self.inform_behavior.add_request_handler(self.on_request)
         self.consult_behavior = FipaRequestProtocol(self, is_initiator=True)
 
-    def handle_request(self, message):
+    def on_request(self, message):
         content = message.content
         display_message(self.aid.name, f'I received REQUEST: {content} from {message.sender.name}')
 
@@ -119,7 +119,7 @@ class Calculator(ImprovedAgent):
     def __init__(self, aid):
         super(Calculator, self).__init__(aid)
         self.calculator_behaviour = FipaRequestProtocol(self, is_initiator=False)
-        self.calculator_behaviour.add_callback(self.on_request)
+        self.calculator_behaviour.add_request_handler(self.on_request)
         self.behaviours.append(self.calculator_behaviour)
 
     def on_request(self, message: ACLMessage):
