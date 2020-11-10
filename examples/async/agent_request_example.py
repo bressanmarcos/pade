@@ -52,10 +52,10 @@ class Recipient(ImprovedAgent):
         super(Recipient, self).__init__(aid=aid)
         self.calculator_aid = calculator_aid
         self.inform_behavior = FipaRequestProtocol(self, is_initiator=False)
-        self.inform_behavior.add_callback(self.handle_request)
+        self.inform_behavior.add_request_handler(self.on_request)
         self.consult_behavior = FipaRequestProtocol(self, is_initiator=True)
 
-    def handle_request(self, message):
+    def on_request(self, message):
         content = message.content
         display_message(self.aid.name, f'I received REQUEST: {content} from {message.sender.name}')
 
@@ -94,9 +94,8 @@ class Recipient(ImprovedAgent):
                     display_message(self.aid.name, f'Calling callback')
                     def return_inform():
                         reply_inform = message.create_reply()
-                        reply_inform.set_performative(ACLMessage.INFORM)
                         reply_inform.set_content(f'The result is: {result}')
-                        self.send(reply_inform)
+                        self.inform_behavior.send_inform(reply_inform)
                     # Use reactor thread to send message
                     call_from_thread(return_inform)
 
@@ -110,16 +109,15 @@ class Recipient(ImprovedAgent):
         call_in_thread(do_long_job)
         
         reply_agree = message.create_reply()
-        reply_agree.set_performative(ACLMessage.AGREE)
         reply_agree.set_content('OK, I`ll do it, wait for me!')
-        self.send(reply_agree)
+        self.inform_behavior.send_agree(reply_agree)
 
 
 class Calculator(ImprovedAgent):
     def __init__(self, aid):
         super(Calculator, self).__init__(aid)
         self.calculator_behaviour = FipaRequestProtocol(self, is_initiator=False)
-        self.calculator_behaviour.add_callback(self.on_request)
+        self.calculator_behaviour.add_request_handler(self.on_request)
         self.behaviours.append(self.calculator_behaviour)
 
     def on_request(self, message: ACLMessage):
@@ -127,9 +125,8 @@ class Calculator(ImprovedAgent):
         display_message(self.aid.name, f'I received REQUEST: {content} from {message.sender.name}')
 
         reply = message.create_reply()
-        reply.set_performative(ACLMessage.INFORM)
         reply.set_content(str(eval(content)))
-        self.send(reply)
+        self.calculator_behaviour.send_inform(reply)
 
 if __name__ == "__main__":
     agents = list()
