@@ -104,12 +104,10 @@ class Contractor(ImprovedAgent):
 
         if randint(0, 1000) > 750:
             # Refuse
-            reply.set_performative(ACLMessage.REFUSE)
             self.contract_net.send_refuse(reply)
             return
 
         # Propose
-        reply.set_performative(ACLMessage.PROPOSE)
         reply.set_content(str(randint(0, 1000)))
 
         @self.contract_net.synchronize

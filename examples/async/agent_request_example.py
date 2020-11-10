@@ -94,9 +94,8 @@ class Recipient(ImprovedAgent):
                     display_message(self.aid.name, f'Calling callback')
                     def return_inform():
                         reply_inform = message.create_reply()
-                        reply_inform.set_performative(ACLMessage.INFORM)
                         reply_inform.set_content(f'The result is: {result}')
-                        self.send(reply_inform)
+                        self.inform_behavior.send_inform(reply_inform)
                     # Use reactor thread to send message
                     call_from_thread(return_inform)
 
@@ -110,9 +109,8 @@ class Recipient(ImprovedAgent):
         call_in_thread(do_long_job)
         
         reply_agree = message.create_reply()
-        reply_agree.set_performative(ACLMessage.AGREE)
         reply_agree.set_content('OK, I`ll do it, wait for me!')
-        self.send(reply_agree)
+        self.inform_behavior.send_agree(reply_agree)
 
 
 class Calculator(ImprovedAgent):
@@ -127,9 +125,8 @@ class Calculator(ImprovedAgent):
         display_message(self.aid.name, f'I received REQUEST: {content} from {message.sender.name}')
 
         reply = message.create_reply()
-        reply.set_performative(ACLMessage.INFORM)
         reply.set_content(str(eval(content)))
-        self.send(reply)
+        self.calculator_behaviour.send_inform(reply)
 
 if __name__ == "__main__":
     agents = list()
